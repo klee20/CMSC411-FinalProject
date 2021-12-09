@@ -44,6 +44,7 @@ int main (int argc, char* argv[]){
     }
     else{
         //Start the program - pass the file name to the readfile function
+        ReadFile(argv[1]);
     }
 }
 
@@ -60,13 +61,25 @@ void ReadFile(string fileName){
             loopStart = lines[numLines][0].find("Loop:");
             if(loopStart >= 0){
                 lines[numLines][0].erase(loopStart, 6); //Removes "Loop:    " from the line, to make things easier
+                loopStart = numLines; //Records what line the loop starts
             }
+            
             //Now take apart the string...
             temp = lines[numLines][0].find("    ");
             if(temp != -1){
                 lines[numLines][0].erase(temp,1); //Removes any tabs from the start
             }
+            
+            //Now that all whitespace & trash are gone, we can read in the commands + arguments
+            //Find position of the first space character (marks the end of a command)
+            temp = lines[numLines][0].find(" ");
+            //This part depends on the fact that there are no empty lines in the txt file
+            lines[numLines][1] = lines[numLines][0].substr(temp+1); //Copies everything after the space into column 1
+            lines[numLines][0].erase(temp, lines[numLines][0].length() - 1); //Leaves just the command in column 0
+            cout<< lines[numLines][0] << endl;
+            cout<< lines[numLines][1] << endl;
 
+            numLines++;
         }
     }
 }

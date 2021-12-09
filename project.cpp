@@ -48,6 +48,11 @@ int main (int argc, char* argv[]){
     }
 }
 
+/* ******************************************************************************
+FUNCTION: void ReadFile(string fileName)
+
+Reads File, separates commands and arguments so the "computer" can recognize them
+*/
 void ReadFile(string fileName){
     ifstream file (fileName);
     string lines[128][4];
@@ -74,10 +79,19 @@ void ReadFile(string fileName){
             //Find position of the first space character (marks the end of a command)
             temp = lines[numLines][0].find(" ");
             //This part depends on the fact that there are no empty lines in the txt file
-            lines[numLines][1] = lines[numLines][0].substr(temp+1); //Copies everything after the space into column 1
+            lines[numLines][1] = lines[numLines][0].substr(temp + 1); //Copies everything after the space into column 1
             lines[numLines][0].erase(temp, lines[numLines][0].length() - 1); //Leaves just the command in column 0
+            
+            for(int i = 1; i < 3; i++){ //Loops to separate up to 3 arguments
+                temp = lines[numLines][i].find(","); //Finds the first comma in Column 1
+                if(temp != -1){
+                    lines[numLines][i + 1] = lines[numLines][i].substr(temp + 1); //Copies everything after the comma into the next column
+                    lines[numLines][i].erase(temp, lines[numLines][i].length() - 1); //Leaves a single argument in each column
+                }
+            }
 
             numLines++;
         }
     }
+    file.close();
 }

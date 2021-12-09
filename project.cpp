@@ -20,9 +20,10 @@ int dataMem[] = {45,12,0,92,10,135,254,127,18,4,55,8,2,98,13,5,233,158,167};
 float FP_Registers[32];
 //Initialize integer registers - set to 0 in main function
 int Int_Registers[32];
+int write_offset = 0;
 
 void ReadFile(string fileName);
-void Write(string operation);
+void Write(string operation[]);
 void DumpMemory();
 
 /* ******************************************************************************
@@ -98,4 +99,16 @@ void ReadFile(string fileName){
     //Critical data to take away:
     //  - lines[128][4]
     //  - loopStart
+}
+
+void Write(string operation[]){
+    ofstream file ("output.csv");
+    for(int i = 0; i < sizeof(operation); i++){
+        file << operation[i];
+        if(i != sizeof(operation) - 1){ //No commas at the end of the line
+            file << ",";
+        }
+    }
+    file << "\n";
+    file.close();
 }

@@ -97,12 +97,13 @@ void ReadFile(string fileName){
     file.close();
 
     //Critical data to take away:
-    //  - lines[128][4]
-    //  - loopStart
+    //  - lines[128][4] - Maybe make this a global variable to avoid pointers?
+    //  - loopStart 
 }
 
 void Write(string operation[]){
     ofstream file ("output.csv");
+    
     for(int i = 0; i < sizeof(operation); i++){
         file << operation[i];
         if(i != sizeof(operation) - 1){ //No commas at the end of the line
@@ -110,5 +111,6 @@ void Write(string operation[]){
         }
     }
     file << "\n";
+    
     file.close();
 }

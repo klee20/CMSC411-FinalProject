@@ -22,7 +22,7 @@ float FP_Registers[32];
 int Int_Registers[32];
 
 void ReadFile(string fileName);
-void Write(string operation[]);
+void Write(string operation);
 void DumpMemory();
 
 /* ******************************************************************************
@@ -94,4 +94,8 @@ void ReadFile(string fileName){
         }
     }
     file.close();
+
+    //Critical data to take away:
+    //  - lines[128][4]
+    //  - loopStart
 }

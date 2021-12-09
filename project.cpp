@@ -65,7 +65,7 @@ void ReadFile(string fileName){
             }
             
             //Now take apart the string...
-            temp = lines[numLines][0].find("    ");
+            temp = lines[numLines][0].find("	");
             if(temp != -1){
                 lines[numLines][0].erase(temp,1); //Removes any tabs from the start
             }
@@ -76,8 +76,6 @@ void ReadFile(string fileName){
             //This part depends on the fact that there are no empty lines in the txt file
             lines[numLines][1] = lines[numLines][0].substr(temp+1); //Copies everything after the space into column 1
             lines[numLines][0].erase(temp, lines[numLines][0].length() - 1); //Leaves just the command in column 0
-            cout<< lines[numLines][0] << endl;
-            cout<< lines[numLines][1] << endl;
 
             numLines++;
         }

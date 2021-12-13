@@ -188,12 +188,22 @@ void Write(string operation[]){
 
 int* GetDataMem(string argument){
     int *dataMemPtr;
+    int address;
     size_t temp = argument.find("("); //Finds the first open parenthesis, denoting the end of the offset
     //Since the positions of a string start at 0, this number is also the size, in characters, of the offset
     int offset = stoi(argument, &temp);
-    argument.erase(0, temp + 1); //Erases from position 0 to the "$" of the data memory address
-    int address = stoi(argument, nullptr); 
-    //There are no more numbers left in the string except for address, so no need to worry about bounds
+    argument.erase(0, temp); //Erases from position 0 to the "$" of the data memory address
+    size_t temp = argument.find("$");
+    
+    if(temp != -1){ //The address is in a register
+        argument.erase(temp, 1); //Erases just the "$"
+        address = stoi(argument, nullptr); 
+        //There are no more numbers left in the string except for address, so no need to worry about bounds
+        address = Int_Registers[address];
+    }else{
+        address = stoi(argument, nullptr); 
+        //There are no more numbers left in the string except for address, so no need to worry about bounds
+    }
 
     if((offset + address) >= sizeof(dataMem)){
         offset = offset % sizeof(dataMem);

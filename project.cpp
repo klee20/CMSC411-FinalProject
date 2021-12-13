@@ -26,6 +26,7 @@ int write_offset = 0;
 void ReadFile(string fileName);
 void Write(string operation[]);
 void DumpMemory();
+int* GetDataMem(string argument);
 
 //passes an initialized empty 2D vector and fills it
 void VectorFill(string lines[][4], int numLines, vector<vector<string>> &container);
@@ -158,21 +159,17 @@ void ReadFile(string fileName){
     //  - loopStart 
 
 
-//initialize a vector and fill it
-vector<vector<string>> container;
-for(int i = 0; i < numLines; i++){
-    vector<string> vect;
-    container.push_back(vect);
+    //initialize a vector and fill it
+    vector<vector<string>> container;
+    for(int i = 0; i < numLines; i++){
+        vector<string> vect;
+        container.push_back(vect);
+    }
+
+    vector_fill(lines,numLines,container);
+    Write_mod(container);
+
 }
-
-vector_fill(lines,numLines,container);
-Write_mod(container);
-
-}
-
-
-
-
 
 
 void Write(string operation[]){
@@ -187,4 +184,27 @@ void Write(string operation[]){
     file << "\n";
     
     file.close();
+}
+
+int* GetDataMem(string argument){
+    int *dataMemPtr;
+    size_t temp = argument.find("("); //Finds the first open parenthesis, denoting the end of the offset
+    //Since the positions of a string start at 0, this number is also the size, in characters, of the offset
+    int offset = stoi(argument, &temp);
+    argument.erase(0, temp + 1); //Erases from position 0 to the "$" of the data memory address
+    int address = stoi(argument, nullptr); 
+    //There are no more numbers left in the string except for address, so no need to worry about bounds
+
+    if((offset + address) >= sizeof(dataMem)){
+        offset = offset % sizeof(dataMem);
+        //Passes the offset through a modulus, in case the offset is larger than the dataMem size
+        //This is because the data memory address rolls over when it goes over the last address
+        address = address + offset;
+        if(address > (sizeof(dataMem) - 1)){ //Handles the address rollover
+            address = address - sizeof(dataMem);
+        }
+    }
+
+    dataMemPtr = &dataMem[address];
+    return dataMemPtr;
 }

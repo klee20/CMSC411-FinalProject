@@ -6,6 +6,7 @@ Authors: Deven Parmar and Kevin Lee
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 using namespace std;
 
 //The cycles that each component takes will never change, so they are listed here as constants
@@ -25,6 +26,15 @@ int write_offset = 0;
 void ReadFile(string fileName);
 void Write(string operation[]);
 void DumpMemory();
+
+//passes an initialized empty 2D vector and fills it
+void VectorFill(string lines[][4], int numLines, vector<vector<string>> &container);
+
+//function that writes to csv from 2D vector
+void WriteMod(vector<vector<string>> &container);
+
+
+
 
 /* ******************************************************************************
 FUNCTION: int main()
@@ -48,6 +58,53 @@ int main (int argc, char* argv[]){
         ReadFile(argv[1]);
     }
 }
+
+
+
+
+//fills vector, can implement logic for printing here 
+void vector_fill(string lines[][4], int numLines, vector<vector<string>> &container){
+
+//example of filling vector (no logic just prints)
+
+int cycle = 1; //current cycle
+int nextAvailable = 1; //next available cycle
+string full_cycle[5] = {"IF", "ID","EX", "MEM", "WB"}; 
+string spacer = "  "; //keeps equal whitespace on the left side
+
+for(int i = 0; i < numLines; i++){
+    
+    int counter = 0;
+    //fills whitespace on left side
+    while(counter != nextAvailable){
+        container[i].push_back(spacer);
+        counter++;
+    }
+    for(int j = 0; j < 5; j++){
+        container[i].push_back(full_cycle[j]);
+        cycle++;
+    }
+    nextAvailable++;
+}
+}
+
+
+//modified write to output csv from 2D vector
+void Write_mod(vector<vector<string>> &container){
+  ofstream file("output.csv");
+
+  cout << "outputting csv file" << endl;
+
+  for(int i = 0; i < static_cast<int>(container.size()); i++){
+    for(int j = 0; j < static_cast<int>(container[i].size()); j++){
+      file << container[i][j] << ",";
+    }
+    file << endl;
+  }
+}
+
+
+
 
 /* ******************************************************************************
 FUNCTION: void ReadFile(string fileName)
@@ -99,7 +156,24 @@ void ReadFile(string fileName){
     //Critical data to take away:
     //  - lines[128][4] - Maybe make this a global variable to avoid pointers?
     //  - loopStart 
+
+
+//initialize a vector and fill it
+vector<vector<string>> container;
+for(int i = 0; i < numLines; i++){
+    vector<string> vect;
+    container.push_back(vect);
 }
+
+vector_fill(lines,numLines,container);
+Write_mod(container);
+
+}
+
+
+
+
+
 
 void Write(string operation[]){
     ofstream file ("output.csv");

@@ -22,17 +22,21 @@ float FP_Registers[32];
 //Initialize integer registers - set to 0 in main function
 int Int_Registers[32];
 int write_offset = 0;
+string lines[128][4];
+int loopStart = -1;
+
+int Instruction_Status[92]; //A register that keeps track of the availability of the components of this "computer"
+//Position 0 - 4: IF,ID, EX, MEM, WB (in this order)
+//Position 5 - 8: FP Adder, FP Multiplier, FP Divider, Integer Unit (In this order)
+//Position 8 - 40: FP Registers
+//Position 41 - 72: Int Registers
+//Position 73 - 92: Data Memory
 
 void ReadFile(string fileName);
 void Write(string operation[]);
 void DumpMemory();
-int* GetDataMem(string argument);
-
-//passes an initialized empty 2D vector and fills it
-void VectorFill(string lines[][4], int numLines, vector<vector<string>> &container);
-
-//function that writes to csv from 2D vector
-void WriteMod(vector<vector<string>> &container);
+int* OpenDataMem(string argument);
+void Compute();
 
 
 
@@ -61,52 +65,6 @@ int main (int argc, char* argv[]){
 }
 
 
-
-
-//fills vector, can implement logic for printing here 
-void vector_fill(string lines[][4], int numLines, vector<vector<string>> &container){
-
-//example of filling vector (no logic just prints)
-
-int cycle = 1; //current cycle
-int nextAvailable = 1; //next available cycle
-string full_cycle[5] = {"IF", "ID","EX", "MEM", "WB"}; 
-string spacer = "  "; //keeps equal whitespace on the left side
-
-for(int i = 0; i < numLines; i++){
-    
-    int counter = 0;
-    //fills whitespace on left side
-    while(counter != nextAvailable){
-        container[i].push_back(spacer);
-        counter++;
-    }
-    for(int j = 0; j < 5; j++){
-        container[i].push_back(full_cycle[j]);
-        cycle++;
-    }
-    nextAvailable++;
-}
-}
-
-
-//modified write to output csv from 2D vector
-void Write_mod(vector<vector<string>> &container){
-  ofstream file("output.csv");
-
-  cout << "outputting csv file" << endl;
-
-  for(int i = 0; i < static_cast<int>(container.size()); i++){
-    for(int j = 0; j < static_cast<int>(container[i].size()); j++){
-      file << container[i][j] << ",";
-    }
-    file << endl;
-  }
-}
-
-
-
-
 /* ******************************************************************************
 FUNCTION: void ReadFile(string fileName)
 
@@ -114,9 +72,7 @@ Reads File, separates commands and arguments so the "computer" can recognize the
 */
 void ReadFile(string fileName){
     ifstream file (fileName);
-    string lines[128][4];
     int numLines = 0;
-    int loopStart = -1;
     int temp = 0;
 
     if(file.is_open()){
@@ -153,22 +109,6 @@ void ReadFile(string fileName){
         }
     }
     file.close();
-
-    //Critical data to take away:
-    //  - lines[128][4] - Maybe make this a global variable to avoid pointers?
-    //  - loopStart 
-
-
-    //initialize a vector and fill it
-    vector<vector<string>> container;
-    for(int i = 0; i < numLines; i++){
-        vector<string> vect;
-        container.push_back(vect);
-    }
-
-    vector_fill(lines,numLines,container);
-    Write_mod(container);
-
 }
 
 
@@ -186,13 +126,18 @@ void Write(string operation[]){
     file.close();
 }
 
-int* GetDataMem(string argument){
+/* ******************************************************************************************
+FUNCTION: int* OpenDataMem(string argument)
+
+Interprets Data Mem argument string, finds address, returns a pointer to the data memory location
+*/
+int* OpenDataMem(string argument){
     int *dataMemPtr;
     int address;
     size_t temp = argument.find("("); //Finds the first open parenthesis, denoting the end of the offset
     //Since the positions of a string start at 0, this number is also the size, in characters, of the offset
     int offset = stoi(argument, &temp);
-    argument.erase(0, temp); //Erases from position 0 to the "$" of the data memory address
+    argument.erase(0, temp); //Erases from position 0 to the "(" of the data memory address
     size_t temp = argument.find("$");
     
     if(temp != -1){ //The address is in a register
@@ -217,4 +162,108 @@ int* GetDataMem(string argument){
 
     dataMemPtr = &dataMem[address];
     return dataMemPtr;
+}
+
+void Compute(){
+
+
+    int line;
+    string temp = lines[line][0];
+    int *memLocation;
+    
+    
+
+    //Load a floating point value into Fa - Memory Instruction
+    if (lines[line][0] == "L.D"){
+        //Uses Integer Unit
+    }
+    
+    //Store a floating point value from Fa - Memory Instruction
+    else if (lines[line][0] == "S.D"){
+        //Uses Integer Unit
+    }
+
+    //Load a 64 bit Integer Immediate into $d - Memory Instruction
+    else if (lines[line][0] == "LI"){
+        //Uses Integer Unit
+    }
+        
+    //Load an integer value into $d - Memory Instruction
+    else if (lines[line][0] == "LW"){
+        //Uses Integer Unit
+    }
+        
+    //Store an integer from $s - Memory Instruction
+    else if (lines[line][0] == "SW"){
+        //Uses Integer Unit
+    }
+        
+    //$d = $s + $t - ALU Instruction
+    else if (lines[line][0] == "ADD"){
+        //Uses Integer Unit
+    }
+
+    //$d = $s + immediate - ALU Instruction
+    else if (lines[line][0] == "ADDI"){
+        //Uses Integer Unit
+    }
+
+    //Fd = Fs + Ft - ALU Instruction
+    else if (lines[line][0] == "ADD.D"){
+        //Uses FP Adder
+    }
+
+    //Fd = Fs - Ft - ALU Instruction
+    else if (lines[line][0] == "SUB.D"){
+        //Uses FP Adder
+    }
+
+    //$d = $s - $t - ALU Instruction
+    else if (lines[line][0] == "SUB"){
+        //Uses Integer Unit
+    }
+        
+    //Fd = Fs X Ft - ALU Instruction
+    else if (lines[line][0] == "MUL.D"){
+        //Uses FP Multiplier
+    }
+
+    //Fd = Fs / Ft - ALU Instruction
+    else if (lines[line][0] == "DIV.D"){
+        //Uses FP Divider
+    }
+
+    //IF $S = $T, PC += OFF18(+/-) - Control Instruction
+    else if (lines[line][0] == "BEQ"){
+    }
+
+    //IF $S !=  $T, PC += OFF18(+/-) - Control Instruction
+    else if (lines[line][0] == "BNE"){
+    }
+
+    //PC = PC31:28 :: ADDR28∅ - Control Instruction
+    else if (lines[line][0] == "J"){
+    }
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
